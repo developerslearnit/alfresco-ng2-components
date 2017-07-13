@@ -28,7 +28,7 @@ export class SitesService {
 
     getSites(opts?: any): any {
         return Observable.fromPromise(this.apiService.getInstance().core.sitesApi.getSites(opts))
-            .map(res => this.toJsonArray(res))
+            .map(res => this.convertToArray(res))
             .catch(this.handleError);
     }
 
@@ -49,10 +49,14 @@ export class SitesService {
         return Observable.throw(error || 'Server error');
     }
 
-    private toJsonArray(res: any) {
-        if (res) {
-            return res.list.entries || [];
+    private convertToArray(res: any) {
+        let elementList = [];
+        let filteredList = [];
+        if (res && res.list && res.list.entries) {
+            elementList = res.list.entries || [];
+            filteredList = elementList.map(element => element.entry);
         }
-        return [];
+        return filteredList;
     }
+
 }

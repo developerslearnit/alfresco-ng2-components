@@ -17,8 +17,11 @@
 
 import { DebugElement } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MdSelectModule } from '@angular/material';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MdSelectionModule, MdSelectModule, MdSliderModule, OVERLAY_PROVIDERS, OverlayModule, ScrollDispatcher } from '@angular/material';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { AppConfigModule, CoreModule } from 'ng2-alfresco-core';
+import {Subject} from 'rxjs/Subject';
 import { DropdownSitesComponent } from '../components/sites-dropdown.component';
 import { SitesService } from '../services/sites.service';
 
@@ -60,6 +63,8 @@ let sitesList = {
     }
 };
 
+let scrolledSubject = new Subject();
+
 describe('DropdownSitesComponent', () => {
 
     let component: any;
@@ -71,7 +76,13 @@ describe('DropdownSitesComponent', () => {
         TestBed.configureTestingModule({
             imports: [
                 MdSelectModule,
-                CoreModule.forRoot(),
+                ReactiveFormsModule,
+                OverlayModule,
+                FormsModule,
+                NoopAnimationsModule,
+                CoreModule,
+                MdSelectionModule,
+                MdSliderModule,
                 AppConfigModule.forRoot('app.config.json', {
                     ecmHost: 'http://localhost:9876/ecm'
                 })
@@ -80,7 +91,17 @@ describe('DropdownSitesComponent', () => {
                 DropdownSitesComponent
             ],
             providers: [
-                SitesService
+                OVERLAY_PROVIDERS,
+                SitesService,
+                {
+                    provide: ScrollDispatcher, useFactory: () => {
+                        return {
+                            scrolled: (_delay: number, callback: () => any) => {
+                                return scrolledSubject.asObservable().subscribe(callback);
+                            }
+                        };
+                    }
+                }
             ]
         }).compileComponents();
     }));
@@ -114,8 +135,8 @@ describe('DropdownSitesComponent', () => {
             fixture.detectChanges();
             fixture.whenStable().then(() => {
                 fixture.detectChanges();
-                expect(element.querySelector('#site-dropdown')).toBeDefined();
-                expect(element.querySelector('#giacomo')).toBeDefined();
+                expect(element.querySelector('#site-dropdown')).not.toBeNull();
+                expect(element.querySelector('#giacomo')).not.toBeNull();
                 done();
             });
 

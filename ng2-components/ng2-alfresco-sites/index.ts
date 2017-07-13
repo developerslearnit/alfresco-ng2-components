@@ -16,6 +16,7 @@
  */
 
 import { ModuleWithProviders, NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MdSelectModule } from '@angular/material';
 import { CoreModule } from 'ng2-alfresco-core';
 import { SitesService } from './src/services/sites.service';
@@ -29,7 +30,9 @@ export const SITES_PROVIDERS: any[] = [
 @NgModule({
     imports: [
         CoreModule,
-        MdSelectModule
+        MdSelectModule,
+        FormsModule,
+        ReactiveFormsModule
     ],
     declarations: [
     ],
